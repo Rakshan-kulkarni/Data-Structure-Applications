@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+typedef struct Node
+{
+    int data;
+    struct Node* left;
+    struct Node* right;
+} Node;
+
+Node* createNode(int data)
+{
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+Node* insert(Node* root, int data)
+{
+    if (root == NULL)
+    {
+        return createNode(data);
+    }
+    else if (data < root->data)
+    {
+        root->left = insert(root->left, data);
+    }
+    else if (data > root->data)
+    {
+        root->right = insert(root->right, data);
+    }
+    return root;
+}
+
+void inorderTraversal(Node* root, FILE* file)
+{
+    if (root != NULL)
+    {
+        inorderTraversal(root->left, file);
+        fprintf(file, "%d ", root->data);
+        inorderTraversal(root->right, file);
+    }
+}
+
+void preorderTraversal(Node* root, FILE* file)
+{
+    if (root != NULL)
+    {
+        fprintf(file, "%d ", root->data);
+        preorderTraversal(root->left, file);
+        preorderTraversal(root->right, file);
+    }
+}
+
+void postorderTraversal(Node* root, FILE* file)
+{
+    if (root != NULL)
+    {
+        postorderTraversal(root->left, file);
+        postorderTraversal(root->right, file);
+        fprintf(file, "%d ", root->data);
+    }
+}
+
+int main()
+{
+    FILE* inputFile, * traversalFile, * inorderFile, * preorderFile, * postorderFile;
+    inputFile = fopen("input.txt", "w");
+
+    if (inputFile == NULL)
+    {
+        printf("Failed to open the file.\n");
+        return 1;
+    }
+
+    int n, p, q;
+    printf("Enter the number of random numbers to generate: ");
+    scanf("%d", &n);
+    printf("Enter the range (P Q): ");
+    scanf("%d %d", &p, &q);
+
+    srand(time(NULL));
+
+    for (int i = 0; i < n; i++)
+    {
+        int data = rand() % (q - p + 1) + p;
+        fprintf(inputFile, "%d ", data);
+    }
+
+    fclose(inputFile);
+
+    int rootData;
+
+    inputFile = fopen("input.txt", "r");
+    if (inputFile == NULL)
+    {
+        printf("Failed to open the file.\n");
+        return 1;
+    }
+
+    // Read the first number from the file
+    if (fscanf(inputFile, "%d", &rootData) == EOF)
+    {
+        printf("Failed to read the root node from the file.\n");
+        return 1;
+    }
+
+    Node* root = createNode(rootData);
+
+    // Continue reading the remaining numbers and inserting them into the tree
+    while (fscanf(inputFile, "%d", &rootData) != EOF)
+    {
+        insert(root, rootData);
+    }
+
+    fclose(inputFile);
+
+    traversalFile = fopen("Traversal.txt", "w");
+    inorderFile = fopen("Inorder.txt", "w");
+    preorderFile = fopen("Preorder.txt", "w");
+    postorderFile = fopen("Postorder.txt", "w");
+
+    if (traversalFile == NULL || inorderFile == NULL || preorderFile == NULL || postorderFile == NULL)
+    {
+        printf("Failed to open the files.\n");
+        return 1;
+    }
+
+    inorderTraversal(root, traversalFile);
+    inorderTraversal(root, inorderFile);
+    preorderTraversal(root, preorderFile);
+    postorderTraversal(root, postorderFile);
+
+    fclose(traversalFile);
+    fclose(inorderFile);
+    fclose(preorderFile);
+    fclose(postorderFile);
+
+    printf("Traversals, In-order, Pre-order, Post-order saved to files successfully.\n");
+
+    return 0;
+}
+
