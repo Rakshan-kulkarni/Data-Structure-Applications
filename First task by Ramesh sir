@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+void write(FILE *fp)
+{
+    int n,p,q;
+    printf("\nEnter number of random number to be generated:  ");
+    scanf("%d",&n);
+    printf("\nEnter range P(initial), Q(final): ");
+    scanf("%d%d",&p,&q);
+    for(int i=0;i<n;i++)
+    {
+        int c=rand()%(q-p); /* `int c=rand()%(q-p);` generates a random integer between `p` and `q-1` (inclusive) and
+                            assigns it to the variable `c`. The `%` operator is the modulus operator, which gives the
+                            remainder of the division of `rand()` by `q-p`. This ensures that the random number
+                            generated is within the range of `p` to `q-1`. */
+
+        fprintf(fp,"%d ",c); //fprintf is used to write into file
+    }
+}
+int main()
+{
+    FILE *fp;  /* `FILE *fp;` is declaring a pointer variable `fp` of type `FILE`. This pointer variable will be
+                used to point to a file stream, which can be used to read from or write to a file.*/
+
+    fp=fopen("input.txt","w"); /* In this specific code, `fp` is used to point to a file named "input.txt" that is opened in write mode
+                                using the `fopen()` function. */
+
+    if(fp==NULL)
+    {
+        printf("\nFile not created\n"); // `fp==NULL` is checking if the file stream pointed to by the pointer variable `fp` is equal to
+        exit(0);                        // `NULL`, which means that the file could not be opened or created.*/
+    }
+
+    write(fp); /* `write(fp);` is calling the function `write` and passing the file stream `fp` as an argument.
+                This function generates a specified number of random integers within a given range and writes
+                them to the file pointed to by `fp` using the `fprintf()` function. */
+
+    fclose(fp);  /* `fclose(fp);` is closing the file stream pointed to by the pointer variable `fp`. This is
+                important to ensure that any changes made to the file are saved and that the file is properly
+                closed, which frees up system resources. */
+
+    return 0;
+}
